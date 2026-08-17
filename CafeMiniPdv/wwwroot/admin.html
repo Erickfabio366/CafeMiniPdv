@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Café PDV</title>
+    <link rel="icon" type="image/png" href="/icone.png?v=3">
+    <script src="/htmx.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 16px;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 380px;
+            margin-bottom: 12px;
+        }
+
+        h1, h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .link-voltar {
+            color: #555;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="/" class="link-voltar">← Voltar ao Balcão</a>
+
+    <div id="painel-conteudo" hx-get="/api/admin/dashboard" hx-trigger="load">
+        <p style="color: #666; text-align: center;">Carregando dados do caixa...</p>
+    </div>
+
+    <script>
+        document.body.addEventListener("htmx:responseError", function (evt) {
+            if (evt.detail.xhr.status === 401) {
+                window.location.href = '/';
+            }
+        });
+    </script>
+
+</body>
+</html>

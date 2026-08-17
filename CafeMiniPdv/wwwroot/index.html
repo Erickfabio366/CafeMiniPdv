@@ -1,0 +1,358 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mini PDV - Café</title>
+
+    <link rel="icon" type="image/png" href="/icone.png?v=3">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2e7d32">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PDV Café">
+    <link rel="apple-touch-icon" href="/icone.png?v=3">
+
+    <script src="/htmx.min.js"></script>
+
+    <style>
+        * {
+            touch-action: manipulation;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 16px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.45rem;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .seletor-qtd {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .btn-qtd {
+            background: #e0e0e0;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-qtd:active {
+            background: #bdbdbd;
+        }
+
+        .qtd-display {
+            font-size: 1.4rem;
+            font-weight: bold;
+            width: 35px;
+            color: #222;
+        }
+
+        .desconto-container {
+            margin-bottom: 12px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #eaeaea;
+        }
+
+        .desconto-label {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .desconto-chips {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .chip {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 8px 6px;
+            font-size: 0.82rem;
+            font-weight: bold;
+            color: #555;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.15s ease;
+        }
+
+        .chip.ativo {
+            background: #e65100 !important;
+            color: white !important;
+            border-color: #e65100 !important;
+        }
+
+        .preco-box {
+            font-size: 1.05rem;
+            color: #555;
+            margin-bottom: 14px;
+        }
+
+        .btn-pix {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .botoes-secundarios {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-forma {
+            flex: 1;
+            background-color: #455a64;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-secundario {
+            background: #555;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-confirmar {
+            background: #1b5e20;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #area-resultado:not(:empty) {
+            margin-top: 15px;
+        }
+
+        .aviso-sucesso {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            overflow: hidden;
+            animation: fecharSuave 3s ease forwards;
+        }
+
+        @keyframes fecharSuave {
+            0% {
+                opacity: 1;
+                max-height: 120px;
+                padding: 14px;
+                margin-bottom: 0;
+            }
+
+            75% {
+                opacity: 1;
+                max-height: 120px;
+                padding: 14px;
+                margin-bottom: 0;
+            }
+
+            100% {
+                opacity: 0;
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                margin: 0;
+                border-width: 0;
+            }
+        }
+
+        .link-admin {
+            display: inline-block;
+            margin-top: 20px;
+            color: #bbb;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        .link-admin:hover {
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>☕ Café Torrado na Hora</h1>
+
+        <!-- Quantidade -->
+        <div class="seletor-qtd">
+            <button type="button" class="btn-qtd" onclick="alterarQtd(-1)">−</button>
+            <span id="display-qtd" class="qtd-display">1</span>
+            <button type="button" class="btn-qtd" onclick="alterarQtd(1)">+</button>
+            <input type="hidden" name="quantidade" id="input-qtd" value="1">
+        </div>
+
+        <!-- Descontos -->
+        <div class="desconto-container">
+            <span class="desconto-label">Aplicar Desconto</span>
+            <div class="desconto-chips">
+                <button type="button" class="chip ativo" onclick="setDesconto('none', 0, this)">0%</button>
+                <button type="button" class="chip" onclick="setDesconto('pct', 5, this)">5%</button>
+                <button type="button" class="chip" onclick="setDesconto('pct', 10, this)">10%</button>
+                <button type="button" class="chip" onclick="setDesconto('abs', 2, this)">-R$2</button>
+                <button type="button" class="chip" onclick="setDesconto('abs', 5, this)">-R$5</button>
+            </div>
+            <input type="hidden" name="desconto" id="input-desconto" value="0">
+        </div>
+
+        <!-- Preço Total Dinâmico -->
+        <div class="preco-box">
+            <span id="subtotal-box" style="display:none; color: #888; text-decoration: line-through; margin-right: 6px;"></span>
+            Total: <b id="display-preco" style="color: #2e7d32; font-size: 1.25rem;">R$ 15,00</b>
+        </div>
+
+        <!-- Botões de Venda -->
+        <button class="btn-pix"
+                hx-post="/api/vender/pix"
+                hx-include="#input-qtd, #input-desconto"
+                hx-target="#area-resultado"
+                hx-swap="innerHTML">
+            Vender com Pix
+        </button>
+
+        <div class="botoes-secundarios">
+            <button class="btn-forma"
+                    hx-post="/api/vender/direto/cartao"
+                    hx-include="#input-qtd, #input-desconto"
+                    hx-target="#area-resultado"
+                    hx-swap="innerHTML">
+                💳 Cartão
+            </button>
+            <button class="btn-forma"
+                    hx-post="/api/vender/direto/dinheiro"
+                    hx-include="#input-qtd, #input-desconto"
+                    hx-target="#area-resultado"
+                    hx-swap="innerHTML">
+                💵 Dinheiro
+            </button>
+        </div>
+
+        <div id="area-resultado"></div>
+
+        <div>
+            <a href="/admin.html" class="link-admin">⚙️ Área Restrita</a>
+        </div>
+    </div>
+
+    <script>
+        let qtd = 1;
+        let tipoDesc = "none";
+        let valorDesc = 0;
+        const precoUnitario = parseFloat("{{PRECO_UNITARIO}}") || 15.00;
+
+        function setDesconto(tipo, valor, el) {
+            tipoDesc = tipo;
+            valorDesc = Number(valor);
+
+            document.querySelectorAll(".chip").forEach(c => c.classList.remove("ativo"));
+            el.classList.add("ativo");
+
+            calcularTotais();
+        }
+
+        function alterarQtd(delta) {
+            qtd = Math.max(1, qtd + Number(delta));
+            document.getElementById("display-qtd").innerText = qtd;
+            document.getElementById("input-qtd").value = qtd;
+            calcularTotais();
+        }
+
+        function calcularTotais() {
+            const subtotal = qtd * precoUnitario;
+            let descontoReais = 0;
+
+            if (tipoDesc === "pct") {
+                descontoReais = (subtotal * valorDesc) / 100;
+            } else if (tipoDesc === "abs") {
+                descontoReais = valorDesc;
+            }
+
+            descontoReais = Math.min(descontoReais, subtotal);
+            const total = Math.max(0.01, subtotal - descontoReais);
+
+            document.getElementById("input-desconto").value = descontoReais.toFixed(2);
+
+            const subtotalBox = document.getElementById("subtotal-box");
+            if (descontoReais > 0) {
+                subtotalBox.style.display = "inline";
+                subtotalBox.innerText = "R$ " + subtotal.toFixed(2).replace('.', ',');
+            } else {
+                subtotalBox.style.display = "none";
+            }
+
+            document.getElementById("display-preco").innerText = "R$ " + total.toFixed(2).replace('.', ',');
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+@CafeMiniPdv_HostAddress = http://localhost:5075
+
+### 1. Teste: Registrar uma nova venda de café
+POST {{CafeMiniPdv_HostAddress}}/api/vender
+Content-Type: application/json
+
+### 2. Teste: Simular Webhook do PicPay avisando que foi pago
+POST {{CafeMiniPdv_HostAddress}}/api/webhooks/picpay
+Content-Type: application/json
+{
+  "referenceId": "pedido_1",
+  "status": "paid"
+}
