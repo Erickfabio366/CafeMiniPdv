@@ -112,7 +112,13 @@ app.MapGet("/", (HttpContext context) =>
 
 app.MapGet("/login-google", () =>
 {
-    return Results.Challenge(new AuthenticationProperties { RedirectUri = "/validar-acesso" }, new[] { GoogleDefaults.AuthenticationScheme });
+    var authProps = new AuthenticationProperties
+    {
+        RedirectUri = "/validar-acesso",
+        IsPersistent = true,
+        ExpiresUtc = DateTimeOffset.UtcNow.AddDays(30)
+    };
+    return Results.Challenge(authProps, new[] { GoogleDefaults.AuthenticationScheme });
 });
 
 app.MapGet("/validar-acesso", async (HttpContext context) =>
