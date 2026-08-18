@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using QRCoder;
@@ -14,6 +16,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddDataProtection().PersistKeysToDbContext<AppDbContext>();
 
 // ==========================================
 // AUTENTICAÇÃO COM COOKIE + GOOGLE OAUTH
@@ -582,10 +585,11 @@ async Task<string> GerarHtmlDashboardCompleto(AppDbContext db,
 // ==========================================
 // BANCO DE DADOS & MODELOS
 // ==========================================
-public class AppDbContext : DbContext
+public class AppDbContext : DbContext, IDataProtectionKeyContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     public DbSet<Venda> Vendas => Set<Venda>();
+    public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 }
 
 public class Venda
