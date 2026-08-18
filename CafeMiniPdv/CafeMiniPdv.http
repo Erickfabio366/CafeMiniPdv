@@ -1,13 +1,31 @@
 @CafeMiniPdv_HostAddress = http://localhost:5075
 
-### 1. Teste: Registrar uma nova venda de café
-POST {{CafeMiniPdv_HostAddress}}/api/vender
-Content-Type: application/json
+### 1. Acessar tela principal (Exige cookie de sessão ou entrega tela de Login)
+GET {{CafeMiniPdv_HostAddress}}/
 
-### 2. Teste: Simular Webhook do PicPay avisando que foi pago
-POST {{CafeMiniPdv_HostAddress}}/api/webhooks/picpay
-Content-Type: application/json
-{
-  "referenceId": "pedido_1",
-  "status": "paid"
-}
+### 2. Acessar Dashboard Administrativo (HTMX Fragment)
+GET {{CafeMiniPdv_HostAddress}}/api/admin/dashboard?periodo=hoje&forma=todos&busca=
+
+### 3. Registrar Venda via PIX (Gera Payload e QR Code em Base64)
+POST {{CafeMiniPdv_HostAddress}}/api/vender/pix
+Content-Type: application/x-www-form-urlencoded
+
+quantidade=2&desconto=0
+
+### 4. Registrar Venda Direta (DINHEIRO ou CARTAO)
+POST {{CafeMiniPdv_HostAddress}}/api/vender/direto/DINHEIRO
+Content-Type: application/x-www-form-urlencoded
+
+quantidade=1&desconto=0
+
+### 5. Confirmar Pagamento de Pedido PIX (Substitua 1 pelo ID da venda)
+POST {{CafeMiniPdv_HostAddress}}/api/vendas/confirmar/1
+
+### 6. Cancelar / Estornar Venda (Substitua 1 pelo ID da venda)
+POST {{CafeMiniPdv_HostAddress}}/api/vendas/cancelar/1
+Content-Type: application/x-www-form-urlencoded
+
+periodo=hoje&forma=todos&busca=
+
+### 7. Encerrar Sessão (Logout)
+POST {{CafeMiniPdv_HostAddress}}/api/auth/logout
